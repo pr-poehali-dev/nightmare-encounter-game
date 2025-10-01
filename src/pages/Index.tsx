@@ -96,6 +96,7 @@ const characters: Character[] = [
 export default function Index() {
   const [screen, setScreen] = useState<GameScreen>('menu');
   const [selectedNight, setSelectedNight] = useState<NightMode>(1);
+  const [completedNights, setCompletedNights] = useState<number[]>([]);
   const [gameTime] = useState('23:00');
   const [doorClosed, setDoorClosed] = useState(false);
   const [curtainsClosed, setCurtainsClosed] = useState(false);
@@ -111,6 +112,21 @@ export default function Index() {
     maks: 0,
     shadow: 0
   });
+
+  const isNightUnlocked = (night: number) => {
+    if (night === 1) return true;
+    return completedNights.includes(night - 1);
+  };
+
+  const isExtraUnlocked = () => {
+    return completedNights.includes(5);
+  };
+
+  const completeNight = (night: number) => {
+    if (!completedNights.includes(night)) {
+      setCompletedNights([...completedNights, night]);
+    }
+  };
 
   const getActiveEnemies = (night: NightMode) => {
     switch (night) {
@@ -180,10 +196,15 @@ export default function Index() {
               Играть
             </Button>
             <Button 
-              onClick={() => setScreen('extra')}
-              className="h-14 text-xl bg-[#1a1a1a] hover:bg-[#2a2a2a] border-2 border-[#FF4500]"
+              onClick={() => isExtraUnlocked() ? setScreen('extra') : null}
+              disabled={!isExtraUnlocked()}
+              className={`h-14 text-xl border-2 border-[#FF4500] ${
+                isExtraUnlocked() 
+                  ? 'bg-[#1a1a1a] hover:bg-[#2a2a2a]' 
+                  : 'bg-gray-800 opacity-50 cursor-not-allowed'
+              }`}
             >
-              Экстра
+              {isExtraUnlocked() ? 'Экстра' : '🔒 Экстра (Пройди 5 ночей)'}
             </Button>
             <Button 
               onClick={() => setScreen('records')}
@@ -412,28 +433,56 @@ export default function Index() {
               ВЫБОР НОЧИ
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4, 5].map((night) => (
-                <Card 
-                  key={night}
-                  onClick={() => {
-                    setSelectedNight(night as NightMode);
-                    setScreen('game');
-                  }}
-                  className="bg-[#1a1a1a] border-2 border-[#BB0000] p-6 hover:border-[#FF4500] cursor-pointer transition-all hover:scale-105"
-                  style={{ boxShadow: '0 10px 40px rgba(187, 0, 0, 0.3)' }}
-                >
-                  <div className="text-center">
-                    <h3 className="text-4xl font-bold text-[#FF4500] mb-3">Ночь {night}</h3>
-                    <p className="text-sm text-gray-400">{getNightDescription(night as NightMode)}</p>
-                    {night === 5 && (
-                      <div className="mt-4 text-orange-500 font-bold flex items-center justify-center gap-2">
-                        <Icon name="Skull" size={20} />
-                        БОСС-ФАЙТ
+              {[1, 2, 3, 4, 5].map((night) => {
+                const unlocked = isNightUnlocked(night);
+                const completed = completedNights.includes(night);
+                return (
+                  <Card 
+                    key={night}
+                    onClick={() => {
+                      if (unlocked) {
+                        setSelectedNight(night as NightMode);
+                        setScreen('game');
+                      }
+                    }}
+                    className={`border-2 p-6 transition-all ${
+                      unlocked 
+                        ? 'bg-[#1a1a1a] border-[#BB0000] hover:border-[#FF4500] cursor-pointer hover:scale-105' 
+                        : 'bg-gray-900 border-gray-700 opacity-60 cursor-not-allowed'
+                    }`}
+                    style={unlocked ? { boxShadow: '0 10px 40px rgba(187, 0, 0, 0.3)' } : {}}
+                  >
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-3 mb-3">
+                        {!unlocked && <Icon name="Lock" size={32} className="text-gray-500" />}
+                        <h3 className={`text-4xl font-bold ${
+                          unlocked ? 'text-[#FF4500]' : 'text-gray-500'
+                        }`}>
+                          Ночь {night}
+                        </h3>
+                        {completed && <Icon name="CheckCircle" size={32} className="text-green-500" />}
                       </div>
-                    )}
-                  </div>
-                </Card>
-              ))}
+                      <p className="text-sm text-gray-400">
+                        {unlocked ? getNightDescription(night as NightMode) : 'Пройди предыдущую ночь'}
+                      </p>
+                      {night === 5 && unlocked && (
+                        <div className="mt-4 text-orange-500 font-bold flex items-center justify-center gap-2">
+                          <Icon name="Skull" size={20} />
+                          БОСС-ФАЙТ
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+            <div className="mt-8 text-center">
+              <Button
+                onClick={() => completeNight(selectedNight)}
+                className="bg-green-700 hover:bg-green-800 text-white px-8 py-3"
+              >
+                [DEBUG] Пройти текущую ночь ({selectedNight})
+              </Button>
             </div>
           </div>
         </div>
