@@ -5,7 +5,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import Icon from '@/components/ui/icon';
 
-type GameScreen = 'menu' | 'game' | 'records' | 'characters' | 'settings';
+type GameScreen = 'menu' | 'game' | 'records' | 'characters' | 'settings' | 'extra' | 'nightSelect' | 'customNight';
+type NightMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+interface CustomNightLevels {
+  shiller: number;
+  huper: number;
+  dadrom: number;
+  balod: number;
+  maks: number;
+  shadow: number;
+}
 
 interface Character {
   id: string;
@@ -85,6 +95,7 @@ const characters: Character[] = [
 
 export default function Index() {
   const [screen, setScreen] = useState<GameScreen>('menu');
+  const [selectedNight, setSelectedNight] = useState<NightMode>(1);
   const [gameTime] = useState('23:00');
   const [doorClosed, setDoorClosed] = useState(false);
   const [curtainsClosed, setCurtainsClosed] = useState(false);
@@ -92,6 +103,53 @@ export default function Index() {
   const [flashlightOn, setFlashlightOn] = useState(false);
   const [volume, setVolume] = useState([70]);
   const [graphics, setGraphics] = useState([100]);
+  const [customLevels, setCustomLevels] = useState<CustomNightLevels>({
+    shiller: 0,
+    huper: 0,
+    dadrom: 0,
+    balod: 0,
+    maks: 0,
+    shadow: 0
+  });
+
+  const getActiveEnemies = (night: NightMode) => {
+    switch (night) {
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        return characters.filter(c => c.id !== 'feareatter');
+      case 5:
+        return characters.filter(c => c.id === 'feareatter' || c.id === 'shadow');
+      case 6:
+      case 7:
+        return characters;
+      case 8:
+        return characters.filter(c => c.id !== 'feareatter');
+      default:
+        return characters;
+    }
+  };
+
+  const getNightDescription = (night: NightMode) => {
+    switch (night) {
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        return 'Обычная ночь (23:00 - 9:00)';
+      case 5:
+        return 'Босс-файт: Feareatter + Тень (23:00 - 9:00)';
+      case 6:
+        return '23:00 - 6:00: обычные враги | 6:00 - 9:00: Feareatter';
+      case 7:
+        return 'Все враги одновременно (23:00 - 9:00)';
+      case 8:
+        return 'Кастомная ночь: настрой уровни сам';
+      default:
+        return '';
+    }
+  };
 
   const records = [
     { rank: 1, name: 'Player1', time: '9:00' },
@@ -115,11 +173,17 @@ export default function Index() {
 
           <div className="flex flex-col gap-4 w-80">
             <Button 
-              onClick={() => setScreen('game')}
+              onClick={() => setScreen('nightSelect')}
               className="h-16 text-2xl font-bold bg-gradient-to-r from-[#BB0000] to-[#8B0000] hover:from-[#CC0000] hover:to-[#9B0000] border-2 border-[#FF4500] shadow-lg"
               style={{ boxShadow: '0 10px 40px rgba(187, 0, 0, 0.4)' }}
             >
               Играть
+            </Button>
+            <Button 
+              onClick={() => setScreen('extra')}
+              className="h-14 text-xl bg-[#1a1a1a] hover:bg-[#2a2a2a] border-2 border-[#FF4500]"
+            >
+              Экстра
             </Button>
             <Button 
               onClick={() => setScreen('records')}
@@ -329,6 +393,164 @@ export default function Index() {
                 </Card>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {screen === 'nightSelect' && (
+        <div className="min-h-screen p-8 bg-gradient-to-b from-[#1a1a1a] to-[#2D2D2D]">
+          <Button 
+            onClick={() => setScreen('menu')}
+            variant="ghost"
+            className="mb-8 text-white hover:text-[#FF4500]"
+          >
+            <Icon name="ArrowLeft" size={24} className="mr-2" />
+            Назад
+          </Button>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-5xl font-bold mb-8 text-center" style={{ textShadow: '0 0 20px rgba(255, 69, 0, 0.8)' }}>
+              ВЫБОР НОЧИ
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2, 3, 4, 5].map((night) => (
+                <Card 
+                  key={night}
+                  onClick={() => {
+                    setSelectedNight(night as NightMode);
+                    setScreen('game');
+                  }}
+                  className="bg-[#1a1a1a] border-2 border-[#BB0000] p-6 hover:border-[#FF4500] cursor-pointer transition-all hover:scale-105"
+                  style={{ boxShadow: '0 10px 40px rgba(187, 0, 0, 0.3)' }}
+                >
+                  <div className="text-center">
+                    <h3 className="text-4xl font-bold text-[#FF4500] mb-3">Ночь {night}</h3>
+                    <p className="text-sm text-gray-400">{getNightDescription(night as NightMode)}</p>
+                    {night === 5 && (
+                      <div className="mt-4 text-orange-500 font-bold flex items-center justify-center gap-2">
+                        <Icon name="Skull" size={20} />
+                        БОСС-ФАЙТ
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === 'extra' && (
+        <div className="min-h-screen p-8 bg-gradient-to-b from-[#1a1a1a] to-[#2D2D2D]">
+          <Button 
+            onClick={() => setScreen('menu')}
+            variant="ghost"
+            className="mb-8 text-white hover:text-[#FF4500]"
+          >
+            <Icon name="ArrowLeft" size={24} className="mr-2" />
+            Назад
+          </Button>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-5xl font-bold mb-8 text-center" style={{ textShadow: '0 0 20px rgba(255, 69, 0, 0.8)' }}>
+              ЭКСТРА НОЧИ
+            </h2>
+            <div className="space-y-4">
+              <Card 
+                onClick={() => {
+                  setSelectedNight(6);
+                  setScreen('game');
+                }}
+                className="bg-[#1a1a1a] border-2 border-[#BB0000] p-8 hover:border-[#FF4500] cursor-pointer transition-all hover:scale-105"
+                style={{ boxShadow: '0 10px 40px rgba(187, 0, 0, 0.3)' }}
+              >
+                <div className="text-center">
+                  <h3 className="text-4xl font-bold text-[#FF4500] mb-4">Ночь 6</h3>
+                  <p className="text-lg text-gray-300 mb-2">23:00 - 6:00: Обычные враги</p>
+                  <p className="text-lg text-orange-500 font-bold">6:00 - 9:00: Feareatter</p>
+                </div>
+              </Card>
+
+              <Card 
+                onClick={() => {
+                  setSelectedNight(7);
+                  setScreen('game');
+                }}
+                className="bg-[#1a1a1a] border-2 border-[#BB0000] p-8 hover:border-[#FF4500] cursor-pointer transition-all hover:scale-105"
+                style={{ boxShadow: '0 10px 40px rgba(187, 0, 0, 0.3)' }}
+              >
+                <div className="text-center">
+                  <h3 className="text-4xl font-bold text-[#FF4500] mb-4">Ночь 7</h3>
+                  <p className="text-lg text-red-500 font-bold">ВСЕ ВРАГИ ОДНОВРЕМЕННО</p>
+                  <p className="text-sm text-gray-400 mt-2">Максимальная сложность</p>
+                </div>
+              </Card>
+
+              <Card 
+                onClick={() => setScreen('customNight')}
+                className="bg-[#1a1a1a] border-2 border-[#BB0000] p-8 hover:border-[#FF4500] cursor-pointer transition-all hover:scale-105"
+                style={{ boxShadow: '0 10px 40px rgba(187, 0, 0, 0.3)' }}
+              >
+                <div className="text-center">
+                  <h3 className="text-4xl font-bold text-[#FF4500] mb-4">Ночь 8</h3>
+                  <p className="text-lg text-purple-500 font-bold">КАСТОМНАЯ НОЧЬ</p>
+                  <p className="text-sm text-gray-400 mt-2">Настрой уровень каждого врага (0-30)</p>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === 'customNight' && (
+        <div className="min-h-screen p-8 bg-gradient-to-b from-[#1a1a1a] to-[#2D2D2D]">
+          <Button 
+            onClick={() => setScreen('extra')}
+            variant="ghost"
+            className="mb-8 text-white hover:text-[#FF4500]"
+          >
+            <Icon name="ArrowLeft" size={24} className="mr-2" />
+            Назад
+          </Button>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-5xl font-bold mb-8 text-center" style={{ textShadow: '0 0 20px rgba(255, 69, 0, 0.8)' }}>
+              КАСТОМНАЯ НОЧЬ
+            </h2>
+            <div className="space-y-6 mb-8">
+              {(Object.keys(customLevels) as Array<keyof CustomNightLevels>).map((enemyId) => {
+                const enemy = characters.find(c => c.id === enemyId);
+                if (!enemy) return null;
+                return (
+                  <Card key={enemyId} className="bg-[#1a1a1a] border-2 border-[#BB0000] p-6">
+                    <div className="flex items-center gap-6 mb-4">
+                      <div className="text-5xl">{enemy.image}</div>
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-bold text-[#FF4500]">{enemy.name}</h3>
+                        <p className="text-sm text-gray-400">{enemy.description}</p>
+                      </div>
+                      <div className="text-4xl font-bold text-green-500 w-20 text-center">
+                        {customLevels[enemyId]}
+                      </div>
+                    </div>
+                    <Slider 
+                      value={[customLevels[enemyId]]} 
+                      onValueChange={(val) => setCustomLevels({...customLevels, [enemyId]: val[0]})} 
+                      max={30} 
+                      step={1} 
+                      className="w-full" 
+                    />
+                  </Card>
+                );
+              })}
+            </div>
+            <Button 
+              onClick={() => {
+                setSelectedNight(8);
+                setScreen('game');
+              }}
+              className="w-full h-16 text-2xl font-bold bg-gradient-to-r from-[#BB0000] to-[#8B0000] hover:from-[#CC0000] hover:to-[#9B0000] border-2 border-[#FF4500]"
+              style={{ boxShadow: '0 10px 40px rgba(187, 0, 0, 0.4)' }}
+            >
+              Начать кастомную ночь
+            </Button>
           </div>
         </div>
       )}
