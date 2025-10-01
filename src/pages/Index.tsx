@@ -255,29 +255,69 @@ export default function Index() {
             <div className="relative w-full max-w-7xl">
               <Card className="bg-gradient-to-b from-[#2D2D2D] to-[#1a1a1a] border-4 border-[#BB0000] p-8 shadow-2xl" style={{ boxShadow: '0 20px 60px rgba(187, 0, 0, 0.4)' }}>
                 <div className="grid grid-cols-3 gap-6 mb-8">
-                  <Card className="bg-[#1a1a1a] border-2 border-gray-600 p-6 h-64 flex flex-col items-center justify-center relative overflow-hidden">
-                    <div className="text-6xl mb-4 transition-all hover:scale-110">🪟</div>
-                    <p className="text-sm text-gray-400 text-center">Правое окно</p>
-                    <p className="text-xs text-orange-500 mt-2">Dadrom (4:00)</p>
-                    {flashlightOn && (
-                      <div className="absolute inset-0 bg-yellow-500/20 animate-pulsate"></div>
-                    )}
+                  <Card className="bg-[#1a1a1a] border-2 border-gray-600 p-0 h-80 flex flex-col relative overflow-hidden">
+                    <div className="relative h-full">
+                      <img 
+                        src="/img/206854ae-dd3d-4538-aa57-17451ce1a00d.jpg" 
+                        alt="Правое окно"
+                        className="w-full h-full object-cover"
+                      />
+                      {flashlightOn && (
+                        <div className="absolute inset-0 bg-yellow-500/30 animate-pulsate"></div>
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+                        <p className="text-sm text-gray-300 text-center font-semibold">Правое окно</p>
+                        <p className="text-xs text-orange-500 text-center">Dadrom (4:00)</p>
+                      </div>
+                    </div>
                   </Card>
 
-                  <Card className={`border-2 p-6 h-64 flex flex-col items-center justify-center cursor-pointer transition-all ${doorClosed ? 'bg-[#0a0a0a] border-red-500' : 'bg-[#1a1a1a] border-gray-600'}`}
+                  <Card 
+                    className={`border-2 p-0 h-80 flex flex-col cursor-pointer transition-all relative overflow-hidden ${
+                      doorClosed ? 'border-red-500' : 'border-gray-600'
+                    }`}
                     onClick={() => setDoorClosed(!doorClosed)}
                   >
-                    <Icon name={doorClosed ? "Lock" : "DoorOpen"} size={80} className={doorClosed ? "text-red-500" : "text-gray-400"} />
-                    <p className="text-sm text-gray-400 text-center mt-4">{doorClosed ? 'Закрыто' : 'Открыто'}</p>
-                    <p className="text-xs text-orange-500 mt-2">Balod (5:00)</p>
+                    <div className="relative h-full">
+                      <img 
+                        src="/img/178e08c2-8837-481f-983b-e482c8e8493c.jpg" 
+                        alt="Дверь"
+                        className="w-full h-full object-cover"
+                      />
+                      {doorClosed && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                          <Icon name="Lock" size={100} className="text-red-500" />
+                        </div>
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+                        <p className="text-sm text-gray-300 text-center font-semibold">{doorClosed ? 'Закрыто' : 'Открыто'}</p>
+                        <p className="text-xs text-orange-500 text-center">Balod (5:00)</p>
+                      </div>
+                    </div>
                   </Card>
 
-                  <Card className={`border-2 p-6 h-64 flex flex-col items-center justify-center cursor-pointer transition-all ${curtainsClosed ? 'bg-[#0a0a0a] border-orange-500' : 'bg-[#1a1a1a] border-gray-600'}`}
+                  <Card 
+                    className={`border-2 p-0 h-80 flex flex-col cursor-pointer transition-all relative overflow-hidden ${
+                      curtainsClosed ? 'border-orange-500' : 'border-gray-600'
+                    }`}
                     onClick={() => setCurtainsClosed(!curtainsClosed)}
                   >
-                    <div className="text-6xl mb-4">{curtainsClosed ? '🪟' : '🌙'}</div>
-                    <p className="text-sm text-gray-400 text-center">{curtainsClosed ? 'Шторы закрыты' : 'Шторы открыты'}</p>
-                    <p className="text-xs text-orange-500 mt-2">Shiller/Huper</p>
+                    <div className="relative h-full">
+                      <img 
+                        src="/img/f5339ca9-75d6-4e63-971b-048dbebd8ad1.jpg" 
+                        alt="Переднее окно"
+                        className="w-full h-full object-cover"
+                      />
+                      {curtainsClosed && (
+                        <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                          <div className="text-8xl">🪟</div>
+                        </div>
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+                        <p className="text-sm text-gray-300 text-center font-semibold">{curtainsClosed ? 'Шторы закрыты' : 'Шторы открыты'}</p>
+                        <p className="text-xs text-orange-500 text-center">Shiller/Huper</p>
+                      </div>
+                    </div>
                   </Card>
                 </div>
 
@@ -308,19 +348,47 @@ export default function Index() {
                         </Button>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <Card className="bg-black border border-green-500 p-4 h-48 flex items-center justify-center relative">
-                          <div className="text-center">
-                            <Icon name="Video" size={48} className="mx-auto mb-2 text-green-500" />
-                            <p className="text-green-500 text-sm">Комната 1</p>
+                        <Card className="bg-black border border-green-500 p-0 h-64 relative overflow-hidden">
+                          <img 
+                            src="/img/385a975a-b4a8-478a-82de-b880055cb077.jpg" 
+                            alt="Камера: Комната 1"
+                            className="w-full h-full object-cover opacity-80"
+                            style={{ filter: 'hue-rotate(90deg) saturate(1.5)' }}
+                          />
+                          {flashlightOn && (
+                            <div className="absolute inset-0 bg-yellow-300/40 animate-pulsate"></div>
+                          )}
+                          <div className="absolute top-2 left-2 bg-black/70 px-3 py-1 rounded">
+                            <p className="text-green-500 text-sm font-mono">CAM 01</p>
                           </div>
-                          <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulsate"></div>
+                          <div className="absolute top-2 right-2 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulsate"></div>
+                            <span className="text-red-500 text-xs font-mono">REC</span>
+                          </div>
+                          <div className="absolute bottom-2 left-2 bg-black/70 px-3 py-1 rounded">
+                            <p className="text-green-500 text-xs font-mono">Комната 1</p>
+                          </div>
                         </Card>
-                        <Card className="bg-black border border-green-500 p-4 h-48 flex items-center justify-center relative">
-                          <div className="text-center">
-                            <Icon name="Video" size={48} className="mx-auto mb-2 text-green-500" />
-                            <p className="text-green-500 text-sm">Коридор</p>
+                        <Card className="bg-black border border-green-500 p-0 h-64 relative overflow-hidden">
+                          <img 
+                            src="/img/ba29fbb0-59bd-4edc-a8bb-8ce43e654747.jpg" 
+                            alt="Камера: Коридор"
+                            className="w-full h-full object-cover opacity-80"
+                            style={{ filter: 'hue-rotate(90deg) saturate(1.5)' }}
+                          />
+                          {flashlightOn && (
+                            <div className="absolute inset-0 bg-yellow-300/40 animate-pulsate"></div>
+                          )}
+                          <div className="absolute top-2 left-2 bg-black/70 px-3 py-1 rounded">
+                            <p className="text-green-500 text-sm font-mono">CAM 02</p>
                           </div>
-                          <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulsate"></div>
+                          <div className="absolute top-2 right-2 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulsate"></div>
+                            <span className="text-red-500 text-xs font-mono">REC</span>
+                          </div>
+                          <div className="absolute bottom-2 left-2 bg-black/70 px-3 py-1 rounded">
+                            <p className="text-green-500 text-xs font-mono">Коридор</p>
+                          </div>
                         </Card>
                       </div>
                       <Button 
